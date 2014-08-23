@@ -25,6 +25,7 @@
 #import "UVPostIdeaViewController.h"
 #import "UVBabayaga.h"
 #import "UVUtils.h"
+#import "Theme.h"
 
 @implementation UVWelcomeViewController {
     NSInteger _filter;
@@ -80,7 +81,7 @@
     cell.imageView.image = [UVUtils imageNamed:@"uv_article.png"];
     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     cell.textLabel.numberOfLines = 2;
-    cell.textLabel.font = [UIFont boldSystemFontOfSize:13.0];
+    cell.textLabel.font = [UIFont systemFontOfSize:13.0];
 }
 
 - (void)initCellForFlash:(UITableViewCell *)cell indexPath:(NSIndexPath *)indexPath {
@@ -197,14 +198,20 @@
             next.article = article;
             [self.navigationController pushViewController:next animated:YES];
         } else {
+
             UVHelpTopic *topic = nil;
             if (indexPath.row < [[UVSession currentSession].topics count])
                 topic = (UVHelpTopic *)[[UVSession currentSession].topics objectAtIndex:indexPath.row];
             UVHelpTopicViewController *next = [[UVHelpTopicViewController alloc] initWithTopic:topic];
+
+            self.navigationItem.title = @"";
             [self.navigationController pushViewController:next animated:YES];
         }
     }
+  self.navigationItem.title = @"";
+
     [theTableView deselectRowAtIndexPath:indexPath animated:YES];
+
 }
 
 - (NSString *)tableView:(UITableView *)theTableView titleForHeaderInSection:(NSInteger)section {
@@ -213,7 +220,18 @@
     else if ([UVSession currentSession].config.topicId)
         return [((UVHelpTopic *)[[UVSession currentSession].topics objectAtIndex:0]) name];
     else
-        return NSLocalizedStringFromTableInBundle(@"Knowledge Base", @"UserVoice", [UserVoice bundle], nil);
+       // return NSLocalizedStringFromTableInBundle(@"Knowledge Base", @"UserVoice", [UserVoice bundle], nil);
+
+      return NSLocalizedString(@"Frequently Asked Questions", @"Frequently Asked Questions");
+
+}
+
+// hackery to avoid upper-case table header label
+- (void)tableView:(UITableView *)tableView willDisplayHeaderView:(UIView *)view forSection:(NSInteger)section {
+  if ([view isKindOfClass:[UITableViewHeaderFooterView class]]) {
+    UITableViewHeaderFooterView *tableViewHeaderFooterView = (UITableViewHeaderFooterView *) view;
+    tableViewHeaderFooterView.textLabel.text = [self tableView:tableView titleForHeaderInSection:section];
+  }
 }
 
 - (CGFloat)tableView:(UITableView *)theTableView heightForHeaderInSection:(NSInteger)section {
@@ -295,16 +313,27 @@
 
 #pragma mark ===== Basic View Methods =====
 
+-(void) viewDidLoad {
+    [_tableView setSeparatorInset:UIEdgeInsetsZero];
+}
+
 - (void)loadView {
     [super loadView];
     [UVBabayaga track:VIEW_KB];
     _instantAnswerManager = [UVInstantAnswerManager new];
     _instantAnswerManager.delegate = self;
-    self.navigationItem.title = NSLocalizedStringFromTableInBundle(@"Feedback & Support", @"UserVoice", [UserVoice bundle], nil);
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringFromTableInBundle(@"Close", @"UserVoice", [UserVoice bundle], nil)
-                                                                             style:UIBarButtonItemStylePlain
-                                                                            target:self
-                                                                            action:@selector(dismiss)];
+
+  self.navigationItem.title = NSLocalizedString(@"Help", @"Help");
+  
+    //self.navigationItem.title = NSLocalizedStringFromTableInBundle(@"Feedback & Support", @"UserVoice", [UserVoice bundle], nil);
+
+
+
+  UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(dismiss)];
+
+    [cancelButton setTitleTextAttributes:[Theme navigationBarButtonTextAttributes] forState:UIControlStateNormal];
+
+  self.navigationItem.leftBarButtonItem = cancelButton;
 
     [self setupGroupedTableView];
 
@@ -335,6 +364,16 @@
 - (void)viewWillAppear:(BOOL)animated {
     [_tableView reloadData];
     [super viewWillAppear:animated];
+
+  self.view.backgroundColor = [Theme viewBackground];
+  _tableView.backgroundColor = [Theme viewBackground];
+
+    [_tableView setSeparatorInset:UIEdgeInsetsZero];
+
+  self.navigationItem.title = NSLocalizedString(@"Help", @"Help");
+
+
+
 }
 
 @end

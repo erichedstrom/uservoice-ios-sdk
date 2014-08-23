@@ -44,6 +44,10 @@
     UISwitch *_toggle;
 }
 
+-(void) viewWillAppear:(BOOL)animated {
+  
+}
+
 - (id)init {
     self = [super init];
     
@@ -273,7 +277,7 @@
 
     UILabel *status = [UILabel new]; 
     status.font = [UIFont systemFontOfSize:12];
-    status.text = _suggestion.status.uppercaseString;
+    status.text = _suggestion.status;
     status.textColor = _suggestion.statusColor;
 
     UILabel *date = [UILabel new];
@@ -349,14 +353,14 @@
     if (section == 0) {
         return _suggestion.status || _suggestion.responseText ? 2 : 1;
     } else if (section == 1) {
-        return 1;
+        return 0;
     } else {
         return _comments.count + (_allCommentsRetrieved ? 0 : 1);
     }
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return _instantAnswers ? 1 : 3;
+    return _instantAnswers ? 1 : 2;
 }
 
 - (CGFloat)tableView:(UITableView *)theTableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {

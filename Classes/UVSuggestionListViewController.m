@@ -18,6 +18,8 @@
 #import "UVUtils.h"
 #import "UVBabayaga.h"
 #import "UVPostIdeaViewController.h"
+#import "Theme.h"
+
 
 #define SUGGESTIONS_PAGE_SIZE 10
 #define UV_SEARCH_TEXTBAR 1
@@ -163,7 +165,7 @@
     }
     [(CALayer *)statusColor.layer.sublayers.lastObject setBackgroundColor:suggestion.statusColor.CGColor];
     status.textColor = suggestion.statusColor;
-    status.text = [suggestion.status uppercaseString];
+    status.text = suggestion.status;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)theTableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -181,13 +183,16 @@
 }
 
 - (NSInteger)tableView:(UITableView *)theTableView numberOfRowsInSection:(NSInteger)section {
-    if (section == 0 && [UVSession currentSession].config.showPostIdea && theTableView == _tableView) {
-        return 1;
-    } else if (theTableView == _tableView) {
-        return _forum.suggestions.count + (_forum.suggestions.count < _forum.suggestionsCount || _loading ? 1 : 0);
-    } else {
-        return _searchResults.count;
-    }
+
+  if (section == 0 && [UVSession currentSession].config.showPostIdea && theTableView == _tableView) {
+    return 1;
+  }
+  else if (theTableView == _tableView) {
+    return _forum.suggestions.count + (_forum.suggestions.count < _forum.suggestionsCount || _loading ? 1 : 0);
+  }
+  else {
+    return _searchResults.count;
+  }
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -353,6 +358,9 @@
         [self populateSuggestions];
     }
     [_tableView reloadData];
+
+    [_tableView setSeparatorInset:UIEdgeInsetsZero];
+
 }
 
 - (void)dealloc {

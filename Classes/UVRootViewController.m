@@ -22,6 +22,9 @@
 #import "UVContactViewController.h"
 #import "UVBabayaga.h"
 
+#import "MessageReplyViewController.h"
+#import "Theme.h"
+
 @implementation UVRootViewController
 
 - (id)initWithViewToLoad:(NSString *)theViewToLoad {
@@ -53,6 +56,8 @@
             next = [UVPostIdeaViewController new];
         else if ([_viewToLoad isEqualToString:@"new_ticket"])
             next = [UVContactViewController new];
+        else if ([_viewToLoad isEqualToString:@"ticket_reply"])
+            next = [MessageReplyViewController new];
 
         next.firstController = YES;
         [self.navigationController pushViewController:next animated:NO];
@@ -65,11 +70,20 @@
 - (void)loadView {
     [super loadView];
 
-    self.navigationItem.title = NSLocalizedStringFromTableInBundle(@"Feedback & Support", @"UserVoice", [UserVoice bundle], nil);
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringFromTableInBundle(@"Close", @"UserVoice", [UserVoice bundle], nil)
+  self.navigationItem.title = NSLocalizedString(@"", @"");
+
+    //self.navigationItem.title = NSLocalizedStringFromTableInBundle(@"Feedback & Support", @"UserVoice", [UserVoice bundle], nil);
+    /* self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringFromTableInBundle(@"Close", @"UserVoice", [UserVoice bundle], nil)
                                                                              style:UIBarButtonItemStylePlain
                                                                             target:self
                                                                             action:@selector(dismiss)];
+     */
+
+  UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(dismiss)];
+
+  [cancelButton setTitleTextAttributes:[Theme navigationBarButtonTextAttributes] forState:UIControlStateNormal];
+
+  self.navigationItem.leftBarButtonItem = cancelButton;
 
     self.view = [[UIView alloc] initWithFrame:[self contentFrame]];
     self.view.backgroundColor = [UVStyleSheet instance].loadingViewBackgroundColor;
@@ -100,6 +114,9 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     _loader = [UVInitialLoadManager loadWithDelegate:self action:@selector(pushNextView)];
+
+    _tableView.backgroundColor = [Theme viewBackground];
+    self.view.backgroundColor = [Theme viewBackground];
 }
 
 @end

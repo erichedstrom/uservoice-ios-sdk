@@ -179,7 +179,7 @@
     }
     [(CALayer *)statusColor.layer.sublayers.lastObject setBackgroundColor:suggestion.statusColor.CGColor];
     status.textColor = suggestion.statusColor;
-    status.text = [suggestion.status uppercaseString];
+    status.text = suggestion.status;
 }
 
 - (void)initCellForArticle:(UITableViewCell *)cell finalCondition:(BOOL)final {

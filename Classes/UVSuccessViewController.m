@@ -17,16 +17,19 @@
     [self.navigationController setNavigationBarHidden:YES animated:YES];
     self.view = [UIView new];
     self.view.frame = [self contentFrame];
-    self.view.backgroundColor = [UIColor colorWithRed:0.26f green:0.31f blue:0.35f alpha:1.0f];
+  self.view.backgroundColor = [UIColor whiteColor];
+
+
     UILabel *title = [UILabel new];
     title.text = _titleText;
-    title.textColor = [UIColor whiteColor];
+    title.textColor = [UIColor blackColor];
     title.font = [UIFont systemFontOfSize:26];
     title.textAlignment = NSTextAlignmentCenter;
     title.backgroundColor = [UIColor clearColor];
+
     UILabel *text = [UILabel new];
     text.text = _text;
-    text.textColor = [UIColor whiteColor];
+    text.textColor = [UIColor blackColor];
     text.font = [UIFont systemFontOfSize:15];
     text.numberOfLines = 0;
     text.textAlignment = NSTextAlignmentCenter;
@@ -40,9 +43,9 @@
     [button setTitle:NSLocalizedStringFromTableInBundle(@"Close", @"UserVoice", [UserVoice bundle], nil) forState:UIControlStateNormal];
     [button addTarget:self action:@selector(dismiss) forControlEvents:UIControlEventTouchUpInside];
     UILabel *power = [UILabel new];
-    power.text = NSLocalizedStringFromTableInBundle(@"Powered by UserVoice", @"UserVoice", [UserVoice bundle], nil);
-    power.textColor = [UIColor grayColor];
-    power.font = [UIFont systemFontOfSize:13];
+    power.text = NSLocalizedString(@"WeddingHappy Help is powered by UserVoice", @"WeddingHappy Help is powered by UserVoice");
+    power.textColor = [UIColor lightGrayColor];
+    power.font = [UIFont systemFontOfSize:12];
     power.textAlignment = NSTextAlignmentCenter;
     power.backgroundColor = [UIColor clearColor];
     if ([UVSession currentSession].clientConfig.whiteLabel) {

@@ -14,11 +14,19 @@
 #import "UVBabayaga.h"
 #import "UVDeflection.h"
 #import "UVUtils.h"
+#import "Theme.h"
 
 @implementation UVArticleViewController {
     UILabel *_footerLabel;
     UIButton *_yes;
     UIButton *_no;
+}
+
+-(void) viewWillAppear:(BOOL)animated {
+  self.navigationItem.leftBarButtonItem = nil;
+  
+  [Theme styleNavigationBar:self.navigationController.navigationBar];
+
 }
 
 - (void)loadView {
@@ -29,14 +37,26 @@
 
     CGFloat footerHeight = 46;
     _webView = [UIWebView new];
-    NSString *section = _article.topicName ? [NSString stringWithFormat:@"%@ / %@", NSLocalizedStringFromTableInBundle(@"Knowledge Base", @"UserVoice", [UserVoice bundle], nil), _article.topicName] : NSLocalizedStringFromTableInBundle(@"Knowledge base", @"UserVoice", [UserVoice bundle], nil);
-    NSString *linkColor;
+    //NSString *section = _article.topicName ? [NSString stringWithFormat:@"%@ / %@", NSLocalizedStringFromTableInBundle(@"Knowledge Base", @"UserVoice", [UserVoice bundle], nil), _article.topicName] : NSLocalizedStringFromTableInBundle(@"Knowledge base", @"UserVoice", [UserVoice bundle], nil);
+
+  NSString *section = @"";
+
+  if (_article.topicName) {
+
+    section = [NSString stringWithFormat:@"%@ / %@", NSLocalizedString(@"Frequently Asked Questions", @"Frequently Asked Questions"), _article.topicName];
+  }
+  else {
+
+    section = @""; //NSLocalizedStringFromTableInBundle(@"Knowledge base", @"UserVoice", [UserVoice bundle], nil);
+  }
+
+  NSString *linkColor;
     if (IOS7) {
         linkColor = [UVUtils colorToCSS:self.view.tintColor];
     } else {
         linkColor = @"default";
     }
-    NSString *html = [NSString stringWithFormat:@"<html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"http://cdn.uservoice.com/stylesheets/vendor/typeset.css\"/><style>a { color: %@; }</style></head><body class=\"typeset\" style=\"font-family: HelveticaNeue; margin: 1em; font-size: 15px\"><h5 style='font-weight: normal; color: #999; font-size: 13px'>%@</h5><h3 style='margin-top: 10px; margin-bottom: 20px; font-size: 18px; font-family: HelveticaNeue-Medium; font-weight: normal; line-height: 1.3'>%@</h3>%@</body></html>", linkColor, section, _article.question, _article.answerHTML];
+    NSString *html = [NSString stringWithFormat:@"<html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"http://cdn.uservoice.com/stylesheets/vendor/typeset.css\"/><style>a { color: %@; }</style></head><body class=\"typeset\" style=\"font-family: HelveticaNeue; margin: 1em; font-size: 15px\"><h5 style='font-weight: normal; color: #999; font-size: 13px;'>%@</h5><h3 style='margin-top: 10px; margin-bottom: 20px; font-size: 18px; font-family: HelveticaNeue-Medium; font-weight: normal; line-height: 1.3'>%@</h3>%@</body></html>", linkColor, section, _article.question, _article.answerHTML];
     _webView.backgroundColor = [UIColor whiteColor];
     for (UIView* shadowView in [[_webView scrollView] subviews]) {
         if ([shadowView isKindOfClass:[UIImageView class]]) {

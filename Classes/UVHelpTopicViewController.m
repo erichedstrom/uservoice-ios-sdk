@@ -16,6 +16,7 @@
 #import "UVConfig.h"
 #import "UVBabayaga.h"
 #import "UVClientConfig.h"
+#import "Theme.h"
 
 #define LABEL 100
 #define TOPIC 101
@@ -185,6 +186,13 @@
         _articles = [[UVSession currentSession].articles mutableCopy];
         [_tableView reloadData];
     }
+}
+
+-(void) viewWillAppear:(BOOL)animated {
+  [super viewWillAppear:animated];
+  [_tableView setSeparatorInset:UIEdgeInsetsZero];
+  self.view.backgroundColor = [Theme viewBackground];
+  [Theme styleNavigationBar:self.navigationController.navigationBar];
 }
 
 @end

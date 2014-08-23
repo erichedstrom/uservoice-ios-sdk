@@ -10,18 +10,41 @@
 #import "UVArticle.h"
 #import "UVSuggestion.h"
 #import "UVDeflection.h"
+#import "Theme.h"
 
 @implementation UVInstantAnswersViewController
 
 #pragma mark ===== Basic View Methods =====
 
+-(void) viewDidLoad {
+  // make line go all the way over to the left
+  [_tableView setSeparatorInset:UIEdgeInsetsZero];
+  [self.tableView setSeparatorInset:UIEdgeInsetsZero];
+
+
+}
+
+-(void) viewWillAppear:(BOOL)animated {
+
+  self.view.backgroundColor = [Theme viewBackground];
+  _tableView.backgroundColor = [Theme viewBackground];
+}
+
 - (void)loadView {
     [self setupGroupedTableView];
     self.navigationItem.title = NSLocalizedStringFromTableInBundle(@"Are any of these helpful?", @"UserVoice", [UserVoice bundle], nil);
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringFromTableInBundle(@"Skip", @"UserVoice", [UserVoice bundle], nil)
-                                                                              style:UIBarButtonItemStyleDone
-                                                                             target:self
-                                                                             action:@selector(next)];
+
+  UIBarButtonItem *noButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"No", @"No")
+                                                               style:UIBarButtonItemStyleDone
+                                                              target:self
+                                                              action:@selector(next)];
+
+  [noButton setTitleTextAttributes:[Theme navigationBarButtonTextAttributes] forState:UIControlStateNormal];
+
+  self.navigationItem.rightBarButtonItem = noButton;
+
+  [Theme styleNavigationBar:self.navigationController.navigationBar];
+
 
     NSArray *visibleIdeas = [_instantAnswerManager.ideas subarrayWithRange:NSMakeRange(0, MIN(3, _instantAnswerManager.ideas.count))];
     NSArray *visibleArticles = [_instantAnswerManager.articles subarrayWithRange:NSMakeRange(0, MIN(3, _instantAnswerManager.articles.count))];
@@ -43,8 +66,16 @@
     return [self createCellForIdentifier:identifier tableView:theTableView indexPath:indexPath style:UITableViewCellStyleSubtitle selectable:YES];
 }
 
+// hackery to avoid upper-case table header label
+- (void)tableView:(UITableView *)tableView willDisplayHeaderView:(UIView *)view forSection:(NSInteger)section {
+  if ([view isKindOfClass:[UITableViewHeaderFooterView class]]) {
+    UITableViewHeaderFooterView *tableViewHeaderFooterView = (UITableViewHeaderFooterView *) view;
+    tableViewHeaderFooterView.textLabel.text = [self tableView:tableView titleForHeaderInSection:section];
+  }
+}
+
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    return [self sectionIsArticles:section] ? NSLocalizedStringFromTableInBundle(@"Related articles", @"UserVoice", [UserVoice bundle], nil) : NSLocalizedStringFromTableInBundle(@"Related feedback", @"UserVoice", [UserVoice bundle], nil);
+    return [self sectionIsArticles:section] ? NSLocalizedString(@"Related articles", @"Related articles") : NSLocalizedStringFromTableInBundle(@"Related feedback", @"UserVoice", [UserVoice bundle], nil);
 }
 
 - (void)tableView:(UITableView *)theTableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
