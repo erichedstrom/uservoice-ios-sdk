@@ -113,6 +113,7 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
     _loader = [UVInitialLoadManager loadWithDelegate:self action:@selector(pushNextView)];
 
     _tableView.backgroundColor = [Theme viewBackground];

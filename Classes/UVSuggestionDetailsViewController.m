@@ -44,10 +44,6 @@
     UISwitch *_toggle;
 }
 
--(void) viewWillAppear:(BOOL)animated {
-  
-}
-
 - (id)init {
     self = [super init];
     

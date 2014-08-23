@@ -314,6 +314,7 @@
 #pragma mark ===== Basic View Methods =====
 
 -(void) viewDidLoad {
+    [super viewDidLoad];
     [_tableView setSeparatorInset:UIEdgeInsetsZero];
 }
 

@@ -17,6 +17,7 @@
 #pragma mark ===== Basic View Methods =====
 
 -(void) viewDidLoad {
+  [super viewDidLoad];
   // make line go all the way over to the left
   [_tableView setSeparatorInset:UIEdgeInsetsZero];
   [self.tableView setSeparatorInset:UIEdgeInsetsZero];
@@ -25,6 +26,7 @@
 }
 
 -(void) viewWillAppear:(BOOL)animated {
+  [super viewWillAppear:animated];
 
   self.view.backgroundColor = [Theme viewBackground];
   _tableView.backgroundColor = [Theme viewBackground];
