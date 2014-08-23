@@ -19,11 +19,14 @@
 #import "UVBabayaga.h"
 #import "UVTextWithFieldsView.h"
 
+#import "Theme.h"
+#import "Utilities.h"
+#import "WeddingPerson.h"
+#import "UVUser.h"
+
 @implementation UVContactViewController {
     BOOL _proceed;
     BOOL _sending;
-    UVDetailsFormViewController *_detailsController;
-    UVTextWithFieldsView *_fieldsView;
 }
 
 - (void)loadView {
@@ -38,32 +41,75 @@
     _instantAnswerManager.articleReturnMessage = NSLocalizedStringFromTableInBundle(@"Yes, go to my message", @"UserVoice", [UserVoice bundle], nil);
     _instantAnswerManager.deflectingType = @"Ticket";
 
-    self.navigationItem.title = NSLocalizedStringFromTableInBundle(@"Send us a message", @"UserVoice", [UserVoice bundle], nil);
-    self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringFromTableInBundle(@"Back", @"UserVoice", [UserVoice bundle], nil) style:UIBarButtonItemStylePlain target:nil action:nil];
+  self.navigationItem.title = NSLocalizedString(@"Your Message", @"Your Message");
 
     // using a fields view with no fields extra still gives us better scroll handling
     _fieldsView = [UVTextWithFieldsView new];
-    _fieldsView.textView.placeholder = NSLocalizedStringFromTableInBundle(@"Give feedback or ask for help...", @"UserVoice", [UserVoice bundle], nil);
+    _nameField = [_fieldsView addFieldWithLabel:NSLocalizedStringFromTableInBundle(@"Name", @"UserVoice", [UserVoice bundle], nil)];
+
+    _nameField.text = self.userName;
+
+    _emailField = [_fieldsView addFieldWithLabel:NSLocalizedStringFromTableInBundle(@"Email", @"UserVoice", [UserVoice bundle], nil)];
+    _emailField.keyboardType = UIKeyboardTypeEmailAddress;
+    _emailField.autocorrectionType = UITextAutocorrectionTypeNo;
+    _emailField.autocapitalizationType = UITextAutocapitalizationTypeNone;
+    _emailField.placeholder = NSLocalizedString(@"Optional", @"Optional");
+    WeddingPerson *weddingPerson = [Utilities fetchCurrentWeddingPerson];
+
+    // don't populate the email field if it is the default WeddingPerson.id@appuser..
+    if (![self.userEmail hasPrefix:weddingPerson.objectId]) {
+      _emailField.text = self.userEmail;
+    }
+
+//    _fieldsView.textView.placeholder = NSLocalizedStringFromTableInBundle(@"Give feedback or ask for help...", @"UserVoice", [UserVoice bundle], nil);
+
+      _fieldsView.textView.placeholder = NSLocalizedString(@"Your message...", @"Your message...");
+
     _fieldsView.textViewDelegate = self;
     [self configureView:view
                subviews:NSDictionaryOfVariableBindings(_fieldsView)
             constraints:@[@"|[_fieldsView]|", @"V:|[_fieldsView]|"]];
 
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", @"UserVoice", [UserVoice bundle], nil)
+  /*
+   self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", @"UserVoice", [UserVoice bundle], nil)
                                                                              style:UIBarButtonItemStylePlain
                                                                             target:self
                                                                             action:@selector(requestDismissal)];
+*/
 
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringFromTableInBundle(@"Next", @"UserVoice", [UserVoice bundle], nil)
+  UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(dismiss)];
+
+  [cancelButton setTitleTextAttributes:[Theme navigationBarButtonTextAttributes] forState:UIControlStateNormal];
+
+  self.navigationItem.leftBarButtonItem = cancelButton;
+
+
+  /* self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringFromTableInBundle(@"Next", @"UserVoice", [UserVoice bundle], nil)
                                                                               style:UIBarButtonItemStyleDone
                                                                              target:self
                                                                              action:@selector(next)];
+   
+  */
+
+  UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringFromTableInBundle(@"Send", @"UserVoice", [UserVoice bundle], nil)
+                                                                 style:UIBarButtonItemStyleDone
+                                                                target:self
+                                                                action:@selector(next)];
+
+  [doneButton setTitleTextAttributes:[Theme navigationBarButtonTextAttributes] forState:UIControlStateNormal];
+
+  self.navigationItem.rightBarButtonItem = doneButton;
+
+
     [self loadDraft];
     self.navigationItem.rightBarButtonItem.enabled = ([_fieldsView.textView.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]].length > 0);
     self.view = view;
+
+    [[UVSession currentSession].user enableEmailUpdates:NO delegate:self];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
+  self.navigationItem.title = NSLocalizedString(@"Your Message", @"Your Message");
     [_fieldsView.textView becomeFirstResponder];
     [super viewWillAppear:animated];
 }
@@ -83,6 +129,7 @@
 }
 
 - (void)next {
+   self.navigationItem.title = @"";
     _proceed = YES;
     [self showActivityIndicator];
     [_instantAnswerManager search];
@@ -103,10 +150,16 @@
 }
 
 - (void)hideActivityIndicator {
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringFromTableInBundle(@"Next", @"UserVoice", [UserVoice bundle], nil) style:UIBarButtonItemStyleDone target:self action:@selector(next)];
+  UIBarButtonItem *nextButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringFromTableInBundle(@"Next", @"UserVoice", [UserVoice bundle], nil) style:UIBarButtonItemStyleDone target:self action:@selector(next)];
+
+  self.navigationItem.rightBarButtonItem = nextButton;
+
+  [nextButton setTitleTextAttributes:[Theme navigationBarButtonTextAttributes] forState:UIControlStateNormal];
 }
 
 - (void)skipInstantAnswers {
+    [self sendWithEmail:self.emailField.text name:self.nameField.text fields:[NSMutableDictionary dictionary]];
+/*
     _detailsController = [UVDetailsFormViewController new];
     _detailsController.delegate = self;
     _detailsController.sendTitle = NSLocalizedStringFromTableInBundle(@"Send", @"UserVoice", [UserVoice bundle], nil);
@@ -130,6 +183,7 @@
         _detailsController.selectedFieldValues[key] = @{ @"id" : value, @"label" : value };
     }
     [self.navigationController pushViewController:_detailsController animated:YES];
+ */
 }
 
 - (BOOL)validateCustomFields:(NSDictionary *)fields {
@@ -143,37 +197,63 @@
     return YES;
 }
 
+// send message contents as new UserVoice ticket
+// this method can be overridden to send via other channels, e.g. see MessageReplyViewController
+- (void)doSendContent {
+
+  NSMutableDictionary *customFields = [NSMutableDictionary dictionary];
+
+  [UVTicket createWithMessage:_fieldsView.textView.text andEmailIfNotLoggedIn:self.userEmail andName:self.userName andCustomFields:customFields andDelegate:self];
+}
+
 - (void)sendWithEmail:(NSString *)email name:(NSString *)name fields:(NSDictionary *)fields {
     if (_sending) return;
-    NSMutableDictionary *customFields = [NSMutableDictionary dictionary];
-    for (NSString *key in fields.allKeys) {
-        customFields[key] = fields[key][@"label"];
+
+    NSMutableDictionary *userUpdates = [NSMutableDictionary dictionary];
+
+    if ([Utilities isValidEmailAddress:email] && ![email isEqualToString:self.userEmail]) {
+      userUpdates[@"email"] = email;
+      self.userEmail = email;
     }
-    self.userEmail = email;
-    self.userName = name;
-    if (![UVSession currentSession].user && email.length == 0) {
-        [self alertError:NSLocalizedStringFromTableInBundle(@"Please enter your email address before submitting your ticket.", @"UserVoice", [UserVoice bundle], nil)];
-    } else if (![self validateCustomFields:customFields]) {
-        [self alertError:NSLocalizedStringFromTableInBundle(@"Please fill out all required fields.", @"UserVoice", [UserVoice bundle], nil)];
-    } else {
-        [_detailsController showActivityIndicator];
-        _sending = YES;
-        [UVTicket createWithMessage:_fieldsView.textView.text andEmailIfNotLoggedIn:email andName:name andCustomFields:customFields andDelegate:self];
+    if ([self.userEmail length] == 0) {
+      WeddingPerson *person = [Utilities fetchCurrentWeddingPerson];
+      self.userEmail = [person.objectId stringByAppendingString:@"@appuser.weddinghappy.com"];
     }
+
+    if (![self.userName isEqualToString:name]) {
+      self.userName = name;
+      userUpdates[@"display_name"] = name;
+    }
+
+    [self showActivityIndicator];
+
+    // if we have a new name or email for the user, update the user in UserVoice
+    if ([userUpdates count] > 0) {
+      [[UVSession currentSession].user updateProperties:userUpdates delegate:self];
+    }
+
+    // send the ticket
+    _sending = YES;
+  [self doSendContent];
 }
 
 - (void)didCreateTicket:(UVTicket *)ticket {
     [self clearDraft];
     [UVBabayaga track:SUBMIT_TICKET];
     UVSuccessViewController *next = [UVSuccessViewController new];
-    next.titleText = NSLocalizedStringFromTableInBundle(@"Message sent!", @"UserVoice", [UserVoice bundle], nil);
-    next.text = NSLocalizedStringFromTableInBundle(@"We'll be in touch.", @"UserVoice", [UserVoice bundle], nil);
+    next.titleText = NSLocalizedStringFromTableInBundle(@"Thank you!", @"UserVoice", [UserVoice bundle], nil);
+    next.text = NSLocalizedStringFromTableInBundle(@"Your message has been sent.\n\nWe will send our reply to your Inbox (that's on the Home screen) if your message requires a response.\n\nPlease expect a response within 48 hours.", @"UserVoice", [UserVoice bundle], nil);
     [self.navigationController setViewControllers:@[next] animated:YES];
+}
+
+- (void)didUpdateUser:(UVUser *)user {
+  
 }
 
 - (void)didReceiveError:(NSError *)error {
     _sending = NO;
-    [_detailsController hideActivityIndicator];
+    [self hideActivityIndicator];
+    // [_detailsController hideActivityIndicator];
     [super didReceiveError:error];
 }
 

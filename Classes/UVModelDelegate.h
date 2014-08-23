@@ -34,5 +34,5 @@
 - (void)didSendForgotPassword:(UVUser *)user;
 - (void)didIdentifyUser:(UVUser *)user;
 - (void)didCreateSuggestion:(UVSuggestion *)user;
-
+- (void)didUpdateUser:(UVUser *)user;
 @end

@@ -143,6 +143,9 @@
     [self checkComplete];
 }
 
+- (void)didUpdateUser:(UVUser *)user {
+}
+
 - (void)didRetrieveHelpTopic:(UVHelpTopic *)topic {
     if (_dismissed) return;
     [UVSession currentSession].topics = @[topic];

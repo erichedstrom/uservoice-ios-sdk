@@ -113,6 +113,28 @@
                          rootKey:@"identifications"];
 }
 
+- (id)enableEmailUpdates:(BOOL)enableEmail delegate:(id<UVModelDelegate>)delegate {
+  NSDictionary *update = @{ @"email_updates": @(enableEmail)};
+
+  return [self updateProperties:update delegate:delegate];
+}
+
+- (id)updateProperties:(NSDictionary *)updates delegate:(id<UVModelDelegate>)delegate {
+  
+  NSString *pathWithId = [NSString stringWithFormat:@"/users/%d.json", _userId];
+  NSString *path = [UVUser apiPath:pathWithId];
+  NSDictionary *payload = @{};
+  if (updates) {
+    payload = @{ @"user" : updates };
+  }
+  
+  return [[self class] putPath:path
+                      withJSON:payload
+                        target:delegate
+                      selector:@selector(didUpdateUser:)
+                       rootKey:@"user"];
+}
+
 - (id)initWithDictionary:(NSDictionary *)dict {
     if (self = [super init]) {
         _userId = [(NSNumber *)[dict objectForKey:@"id"] integerValue];

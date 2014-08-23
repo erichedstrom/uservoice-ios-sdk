@@ -32,6 +32,8 @@
 
 // update
 - (id)identify:(NSString *)externalId withScope:(NSString *)externalScope delegate:(id<UVModelDelegate>)delegate;
+- (id)enableEmailUpdates:(BOOL)enableEmail delegate:(id<UVModelDelegate>)delegate;
 
+- (id)updateProperties:(NSDictionary *)updates delegate:(id <UVModelDelegate>)delegate;
 @end
 
