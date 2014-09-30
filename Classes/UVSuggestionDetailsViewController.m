@@ -244,7 +244,6 @@
     UVTruncatingLabel *desc = [UVTruncatingLabel new];
     desc.font = [UIFont systemFontOfSize:14];
     desc.fullText = _suggestion.text;
-    desc.numberOfLines = 0;
     desc.delegate = self;
     desc.tag = SUGGESTION_DESCRIPTION;
 
@@ -289,7 +288,6 @@
         text.font = [UIFont systemFontOfSize:13];
         text.textColor = [UIColor colorWithRed:0.41f green:0.42f blue:0.43f alpha:1.0f];
         text.fullText = _suggestion.responseText;
-        text.numberOfLines = 0;
         text.delegate = self;
         text.tag = ADMIN_RESPONSE;
 
@@ -491,7 +489,7 @@
             ];
         }
         [self configureView:footer
-                   subviews:byRank ? NSDictionaryOfVariableBindings(border, people) : NSDictionaryOfVariableBindings(border, want, people, heart, this)
+                   subviews:byRank ? NSDictionaryOfVariableBindings(border, people, want) : NSDictionaryOfVariableBindings(border, want, people, heart, this)
                 constraints:constraints];
     } else {
         UILabel *want = [UILabel new];
@@ -542,16 +540,38 @@
             constraints:@[@"V:|[table]|", @"V:[footer]|", @"|[table]|", @"|[footer]|"]];
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:footer attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:_footerHeight]];
     [self.view bringSubviewToFront:footer];
-    [self reloadComments];
+
+    _allCommentsRetrieved = NO;
+    _comments = [NSMutableArray arrayWithCapacity:10];
+    [self retrieveMoreComments];
+
     [self updateSubscriberCount];
 }
 
 - (void)initNavigationItem {}
 
-- (void)reloadComments {
-    _allCommentsRetrieved = NO;
-    _comments = [NSMutableArray arrayWithCapacity:10];
-    [self retrieveMoreComments];
+/*
+ * The point of this is to put a newly created comment at the top of the list
+ * without screwing things up too badly. This has to be done because the new
+ * comment won't actually appear in the list until spam filtering is done, and
+ * we don't know when that will be.
+ *
+ * Cutting the comment list down to 1 page with the new comment artificially
+ * inserted at the top seems like the best way to do this. Pagination will
+ * be slightly inaccurate if another comment was created since the first page
+ * was loaded, or if the new comment gets caught in the spam filter. However,
+ * that kind of inaccuracy is to be expected for offset-based pagination.
+ */
+- (void)commentCreated:(UVComment *)comment {
+    NSMutableArray *newComments = [NSMutableArray arrayWithCapacity:10];
+    [newComments addObject:comment];
+    for (int i=0; i < MIN(9, _comments.count); i++) {
+        [newComments addObject:[_comments objectAtIndex:i]];
+    }
+    if (_comments.count > 9)
+        _allCommentsRetrieved = NO;
+    _comments = newComments;
+    [_tableView reloadData];
 }
 
 - (void)showActivityIndicator {
