@@ -17,6 +17,7 @@
 + (id)createWithMessage:(NSString *)message
   andEmailIfNotLoggedIn:(NSString *)email
                 andName:(NSString *)name
+               andTitle:(NSString *)title
         andCustomFields:(NSDictionary *)customFields
             andDelegate:(id<UVModelDelegate>)delegate;
 

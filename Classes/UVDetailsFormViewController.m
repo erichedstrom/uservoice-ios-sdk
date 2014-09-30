@@ -179,7 +179,12 @@
 #pragma mark ===== Misc =====
 
 - (void)send {
-    [_delegate sendWithEmail:_emailField.text name:_nameField.text fields:_selectedFieldValues];
+
+ // NSString *displayName = [NSString stringWithFormat:@"%@ %@", _firstNameField.text, _lastNameField.text];
+
+//  [_delegate sendWithEmail:_emailField.text name:displayName fields:_selectedFieldValues];
+
+
 }
 
 - (void)showActivityIndicator {

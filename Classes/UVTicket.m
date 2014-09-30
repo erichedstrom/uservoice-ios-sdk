@@ -30,6 +30,7 @@
 + (id)createWithMessage:(NSString *)message
   andEmailIfNotLoggedIn:(NSString *)email
                 andName:(NSString *)name
+               andTitle:(NSString *)title
         andCustomFields:(NSDictionary *)fields
             andDelegate:(id<UVModelDelegate>)delegate {
     NSString *path = [self apiPath:@"/tickets.json"];
@@ -37,6 +38,7 @@
         message == nil ? @"" : message, @"ticket[message]",
         email   == nil ? @"" : email,   @"email",
         name    == nil ? @"" : name,    @"display_name",
+        title    == nil ? @"" : title,    @"ticket[subject]",
         [NSString stringWithFormat:@"%d", (int)[UVDeflection interactionIdentifier]], @"interaction_identifier",
         nil];
     

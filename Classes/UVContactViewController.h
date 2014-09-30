@@ -15,7 +15,9 @@
 @interface UVContactViewController : UVBaseViewController<UVInstantAnswersDelegate, UITextViewDelegate, UIActionSheetDelegate>
 
 @property (nonatomic, retain) UITextField *emailField;
-@property (nonatomic, retain) UITextField *nameField;
+@property (nonatomic, retain) UITextField *firstNameField;
+@property (nonatomic, retain) UITextField *lastNameField;
+@property (nonatomic, retain) NSString *title;
 
 @property (nonatomic,retain) UVInstantAnswerManager *instantAnswerManager;
 @property (nonatomic,retain) NSString *loadedDraft;
@@ -23,5 +25,6 @@
 @property(nonatomic, strong) UVTextWithFieldsView *fieldsView;
 
 - (void)doSendContent;
+- (void)next;
 
 @end

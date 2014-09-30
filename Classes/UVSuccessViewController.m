@@ -9,6 +9,7 @@
 #import "UVSuccessViewController.h"
 #import "UVSession.h"
 #import "UVClientConfig.h"
+#import "Theme.h"
 
 @implementation UVSuccessViewController
 
@@ -17,20 +18,20 @@
     [self.navigationController setNavigationBarHidden:YES animated:YES];
     self.view = [UIView new];
     self.view.frame = [self contentFrame];
-  self.view.backgroundColor = [UIColor whiteColor];
+    self.view.backgroundColor = [UIColor whiteColor];
 
 
     UILabel *title = [UILabel new];
     title.text = _titleText;
     title.textColor = [UIColor blackColor];
-    title.font = [UIFont systemFontOfSize:26];
+    title.font = [Theme fontBold];
     title.textAlignment = NSTextAlignmentCenter;
     title.backgroundColor = [UIColor clearColor];
 
     UILabel *text = [UILabel new];
     text.text = _text;
     text.textColor = [UIColor blackColor];
-    text.font = [UIFont systemFontOfSize:15];
+    text.font = [Theme fontSmall];
     text.numberOfLines = 0;
     text.textAlignment = NSTextAlignmentCenter;
     text.backgroundColor = [UIColor clearColor];
@@ -38,8 +39,9 @@
     button.layer.borderWidth = 1.0;
     button.layer.borderColor = [UIColor whiteColor].CGColor;
     button.layer.backgroundColor = [UIColor colorWithRed:0.f green:0.f blue:0.f alpha:0.3f].CGColor;
-    button.layer.cornerRadius = 14.0;
-    button.titleLabel.font = [UIFont systemFontOfSize:14];
+    button.layer.cornerRadius = 0;
+    button.titleLabel.font = [Theme fontSmall];
+
     [button setTitle:NSLocalizedStringFromTableInBundle(@"Close", @"UserVoice", [UserVoice bundle], nil) forState:UIControlStateNormal];
     [button addTarget:self action:@selector(dismiss) forControlEvents:UIControlEventTouchUpInside];
     UILabel *power = [UILabel new];

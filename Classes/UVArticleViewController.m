@@ -112,7 +112,10 @@
         }
     } else {
         if (buttonIndex == 0) {
-            [self presentModalViewController:[UVContactViewController new]];
+
+          UVContactViewController *uvcvc = [UVContactViewController new];
+          uvcvc.title = [NSString stringWithFormat: @"Article Not Helpful: %@", _article.question ];
+            [self presentModalViewController:uvcvc];
         }
     }
 }

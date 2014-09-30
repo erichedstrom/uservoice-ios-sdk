@@ -25,6 +25,9 @@
 // Modally present the UserVoice contact form
 + (void)presentUserVoiceContactUsFormForParentViewController:(UIViewController *)parentViewController;
 
+// Modally present a Message Reply form
++ (void)presentMessageReplyFormForParentViewController:(UIViewController *)parentViewController;
+
 // Modally present the UserVoice new idea form
 + (void)presentUserVoiceNewIdeaFormForParentViewController:(UIViewController *)parentViewController;
 

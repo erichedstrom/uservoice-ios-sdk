@@ -10,6 +10,7 @@
 #import "UVTextView.h"
 #import "UVUtils.h"
 #import "UVDefines.h"
+#import "Theme.h"
 
 @implementation UVTextWithFieldsView {
     NSLayoutConstraint *_heightConstraint;
@@ -88,6 +89,7 @@
     [field setContentHuggingPriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
     UILabel *label = [UILabel new];
     label.text = [NSString stringWithFormat:@"%@:", labelText];
+  label.font = [Theme font];
     label.backgroundColor = [UIColor clearColor];
     label.textColor = [UIColor grayColor];
     [label setContentHuggingPriority:UILayoutPriorityDefaultHigh forAxis:UILayoutConstraintAxisHorizontal];

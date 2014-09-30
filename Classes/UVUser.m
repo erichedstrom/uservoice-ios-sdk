@@ -121,7 +121,7 @@
 
 - (id)updateProperties:(NSDictionary *)updates delegate:(id<UVModelDelegate>)delegate {
   
-  NSString *pathWithId = [NSString stringWithFormat:@"/users/%d.json", _userId];
+  NSString *pathWithId = [NSString stringWithFormat:@"/users/%ld.json", (long)_userId];
   NSString *path = [UVUser apiPath:pathWithId];
   NSDictionary *payload = @{};
   if (updates) {

@@ -18,6 +18,8 @@
 #import "UVSigninManager.h"
 #import "UVKeyboardUtils.h"
 #import "UVUtils.h"
+
+#import "AuthService.h"
 #import "Theme.h"
 
 @implementation UVBaseViewController
@@ -150,6 +152,8 @@
             msg = NSLocalizedStringFromTableInBundle(@"Sorry, there was an error in the application.", @"UserVoice", [UserVoice bundle], nil);
     }
     [self alertError:msg];
+
+    [[AuthService getInstance] handleNetworkError:error forUrl:error.userInfo[NSURLErrorFailingURLStringErrorKey] fromHttpRequest:nil withResponse:nil];
 }
 
 - (void)initNavigationItem {
@@ -397,6 +401,10 @@
 
 - (void)setUserEmail:(NSString *)theEmail {
     _userEmail = theEmail;
+
+    if ([UVSession currentSession].user) {
+        [UVSession currentSession].user.email = theEmail;
+    }
 
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
     [prefs setObject:_userEmail forKey:@"uv-user-email"];

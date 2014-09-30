@@ -6,6 +6,7 @@
 //  Copyright (c) 2013 UserVoice Inc. All rights reserved.
 //
 
+#import "UVAccessToken.h"
 #import "UVContactViewController.h"
 #import "UVInstantAnswersViewController.h"
 #import "UVDetailsFormViewController.h"
@@ -45,15 +46,23 @@
 
     // using a fields view with no fields extra still gives us better scroll handling
     _fieldsView = [UVTextWithFieldsView new];
-    _nameField = [_fieldsView addFieldWithLabel:NSLocalizedStringFromTableInBundle(@"Name", @"UserVoice", [UserVoice bundle], nil)];
 
-    _nameField.text = self.userName;
+    _firstNameField = [_fieldsView addFieldWithLabel:NSLocalizedString(@"First Name", @"First Name") ];
+    _firstNameField.placeholder = NSLocalizedString(@"Required", @"Required");
+    _firstNameField.text = [[NSUserDefaults standardUserDefaults] objectForKey:@"uv-user-first-name"]; //self.userName;
+  _firstNameField.font = [Theme font];
+
+    _lastNameField= [_fieldsView addFieldWithLabel:NSLocalizedString(@"Last Name", @"Last Name")];
+    _lastNameField.placeholder = NSLocalizedString(@"Required", @"Required");
+  _lastNameField.text = [[NSUserDefaults standardUserDefaults] objectForKey:@"uv-user-last-name"];
+    _lastNameField.font = [Theme font];
 
     _emailField = [_fieldsView addFieldWithLabel:NSLocalizedStringFromTableInBundle(@"Email", @"UserVoice", [UserVoice bundle], nil)];
     _emailField.keyboardType = UIKeyboardTypeEmailAddress;
     _emailField.autocorrectionType = UITextAutocorrectionTypeNo;
     _emailField.autocapitalizationType = UITextAutocapitalizationTypeNone;
-    _emailField.placeholder = NSLocalizedString(@"Optional", @"Optional");
+    _emailField.placeholder = NSLocalizedString(@"Required", @"Required");
+    _emailField.font = [Theme font];
     WeddingPerson *weddingPerson = [Utilities fetchCurrentWeddingPerson];
 
     // don't populate the email field if it is the default WeddingPerson.id@appuser..
@@ -64,6 +73,8 @@
 //    _fieldsView.textView.placeholder = NSLocalizedStringFromTableInBundle(@"Give feedback or ask for help...", @"UserVoice", [UserVoice bundle], nil);
 
       _fieldsView.textView.placeholder = NSLocalizedString(@"Your message...", @"Your message...");
+
+  _fieldsView.textView.font = [Theme font];
 
     _fieldsView.textViewDelegate = self;
     [self configureView:view
@@ -158,7 +169,36 @@
 }
 
 - (void)skipInstantAnswers {
-    [self sendWithEmail:self.emailField.text name:self.nameField.text fields:[NSMutableDictionary dictionary]];
+
+
+  if ([self.firstNameField.text length] == 0) {
+
+    UIAlertView *firstNameAlert = [[UIAlertView alloc] initWithTitle:@"Verify First Name" message:@"Please enter your first name." delegate:self
+                                               cancelButtonTitle:@"OK" otherButtonTitles:nil];
+
+    [firstNameAlert show];
+    return;
+
+  }
+
+
+  if ([self.lastNameField.text length] == 0) {
+
+    UIAlertView *lastNameAlert = [[UIAlertView alloc] initWithTitle:@"Verify Last Name" message:@"Please enter your last name." delegate:self
+                                                   cancelButtonTitle:@"OK" otherButtonTitles:nil];
+
+    [lastNameAlert show];
+    return;
+    
+  }
+
+
+  [[NSUserDefaults standardUserDefaults] setObject:self.firstNameField.text forKey:@"uv-user-first-name"];
+  [[NSUserDefaults standardUserDefaults] setObject:self.lastNameField.text forKey:@"uv-user-last-name"];
+
+  NSString *displayName = [NSString stringWithFormat:@"%@ %@", self.firstNameField.text, self.lastNameField.text];
+
+    [self sendWithEmail:self.emailField.text name:displayName fields:[NSMutableDictionary dictionary]];
 /*
     _detailsController = [UVDetailsFormViewController new];
     _detailsController.delegate = self;
@@ -203,21 +243,28 @@
 
   NSMutableDictionary *customFields = [NSMutableDictionary dictionary];
 
-  [UVTicket createWithMessage:_fieldsView.textView.text andEmailIfNotLoggedIn:self.userEmail andName:self.userName andCustomFields:customFields andDelegate:self];
+  [UVTicket createWithMessage:_fieldsView.textView.text andEmailIfNotLoggedIn:self.userEmail andName:self.userName andTitle:self.title andCustomFields:customFields andDelegate:self];
 }
 
 - (void)sendWithEmail:(NSString *)email name:(NSString *)name fields:(NSDictionary *)fields {
     if (_sending) return;
 
     NSMutableDictionary *userUpdates = [NSMutableDictionary dictionary];
+    BOOL changedEmail = NO;
 
     if ([Utilities isValidEmailAddress:email] && ![email isEqualToString:self.userEmail]) {
-      userUpdates[@"email"] = email;
       self.userEmail = email;
+      changedEmail = YES;
     }
-    if ([self.userEmail length] == 0) {
-      WeddingPerson *person = [Utilities fetchCurrentWeddingPerson];
-      self.userEmail = [person.objectId stringByAppendingString:@"@appuser.weddinghappy.com"];
+    WeddingPerson *weddingPerson = [Utilities fetchCurrentWeddingPerson];
+    if ([self.userEmail length] == 0 || [self.userEmail hasPrefix:weddingPerson.objectId]) {
+
+      UIAlertView *emailAlert = [[UIAlertView alloc] initWithTitle:@"Verify Email" message:@"Please enter a valid email address." delegate:self
+                                                 cancelButtonTitle:@"OK" otherButtonTitles:nil];
+
+      [emailAlert show];
+      return;
+
     }
 
     if (![self.userName isEqualToString:name]) {
@@ -228,7 +275,7 @@
     [self showActivityIndicator];
 
     // if we have a new name or email for the user, update the user in UserVoice
-    if ([userUpdates count] > 0) {
+    if ([userUpdates count] > 0 && !changedEmail) {
       [[UVSession currentSession].user updateProperties:userUpdates delegate:self];
     }
 
@@ -241,8 +288,9 @@
     [self clearDraft];
     [UVBabayaga track:SUBMIT_TICKET];
     UVSuccessViewController *next = [UVSuccessViewController new];
-    next.titleText = NSLocalizedStringFromTableInBundle(@"Thank you!", @"UserVoice", [UserVoice bundle], nil);
-    next.text = NSLocalizedStringFromTableInBundle(@"Your message has been sent.\n\nWe will send our reply to your Inbox (that's on the Home screen) if your message requires a response.\n\nPlease expect a response within 48 hours.", @"UserVoice", [UserVoice bundle], nil);
+    next.titleText = NSLocalizedString(@"Thank you!", @"Thank you!");
+
+    next.text = NSLocalizedString(@"Your message has been sent.\n\nWe review our messages regularly. If your request needs a reply, you will find that in your Inbox on the Home screen.", @"Your message has been sent.\n\nWe review our messages regularly. If your request needs a reply, you will find that in your Inbox on the Home screen.");
     [self.navigationController setViewControllers:@[next] animated:YES];
 }
 
