@@ -154,7 +154,7 @@
     }
     [self alertError:msg];
 
-    [[AuthService getInstance] handleNetworkError:error forUrl:error.userInfo[NSURLErrorFailingURLStringErrorKey] fromHttpRequest:nil withResponse:nil];
+  [[AuthService getInstance] handleNetworkError:error withId:nil forUrl:error.userInfo[NSURLErrorFailingURLStringErrorKey] fromHttpRequest:nil withResponse:nil responseBody:nil];
 }
 
 - (void)initNavigationItem {

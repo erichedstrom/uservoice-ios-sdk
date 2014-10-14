@@ -173,8 +173,8 @@
 
   if ([self.firstNameField.text length] == 0) {
 
-    UIAlertView *firstNameAlert = [[UIAlertView alloc] initWithTitle:@"Verify First Name" message:@"Please enter your first name." delegate:self
-                                               cancelButtonTitle:@"OK" otherButtonTitles:nil];
+    UIAlertView *firstNameAlert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Verify First Name", @"Verify First Name") message:NSLocalizedString(@"Please enter your first name.", @"Please enter your first name.") delegate:self
+                                               cancelButtonTitle:NSLocalizedString(@"OK", @"OK") otherButtonTitles:nil];
 
     [firstNameAlert show];
     return;
@@ -184,8 +184,8 @@
 
   if ([self.lastNameField.text length] == 0) {
 
-    UIAlertView *lastNameAlert = [[UIAlertView alloc] initWithTitle:@"Verify Last Name" message:@"Please enter your last name." delegate:self
-                                                   cancelButtonTitle:@"OK" otherButtonTitles:nil];
+    UIAlertView *lastNameAlert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Verify Last Name", @"Verify Last Name") message:NSLocalizedString(@"Please enter your last name.", @"Please enter your last name.") delegate:self
+                                                   cancelButtonTitle:NSLocalizedString(@"OK", @"OK") otherButtonTitles:nil];
 
     [lastNameAlert show];
     return;
@@ -259,8 +259,8 @@
     WeddingPerson *weddingPerson = [Utilities fetchCurrentWeddingPerson];
     if ([self.userEmail length] == 0 || [self.userEmail hasPrefix:weddingPerson.objectId]) {
 
-      UIAlertView *emailAlert = [[UIAlertView alloc] initWithTitle:@"Verify Email" message:@"Please enter a valid email address." delegate:self
-                                                 cancelButtonTitle:@"OK" otherButtonTitles:nil];
+      UIAlertView *emailAlert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Verify Email", @"Verify Email") message:NSLocalizedString(@"Please enter a valid email address.", @"Please enter a valid email address.") delegate:self
+                                                 cancelButtonTitle:NSLocalizedString(@"OK", @"OK") otherButtonTitles:nil];
 
       [emailAlert show];
       return;
