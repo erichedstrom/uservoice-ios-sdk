@@ -58,7 +58,7 @@
     barFrame = self.navigationController.navigationBar.frame;
     CGRect appFrame = [UIScreen mainScreen].applicationFrame;
     CGFloat yStart = barFrame.origin.y + barFrame.size.height;
-    
+
     return CGRectMake(0, yStart, appFrame.size.width, appFrame.size.height - barFrame.size.height);
 }
 
@@ -93,7 +93,7 @@
     if (!self.navigationItem) {
         return;
     }
-    
+
     if (self.navigationItem.rightBarButtonItem) {
         self.navigationItem.rightBarButtonItem.enabled = enabled;
     }
@@ -210,7 +210,7 @@
             parent.view.superview.frame = parent.presentedViewController.view.superview.frame;
         }
     }
-    
+
     [super willAnimateRotationToInterfaceOrientation:toInterfaceOrientation duration:duration];
 }
 
@@ -237,7 +237,7 @@
             parent.view.superview.hidden = NO;
         }
     }
-    
+
     if (!IOS7 && _tableView) {
         [_tableView reloadData];
     }
@@ -304,7 +304,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(keyboardWillHide:)
                                                  name:UIKeyboardWillHideNotification object:nil];
-    
+
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(keyboardDidHide:)
                                                  name:UIKeyboardDidHideNotification object:nil];
@@ -537,9 +537,17 @@
 - (void) viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     [self.tableView setContentOffset:self.tableView.contentOffset animated:NO];
+    [super viewWillDisappear:animated];
 }
 
 - (void)dealloc {
+    if (self.tableView) {
+        self.tableView.dataSource = nil;
+        self.tableView.delegate = nil;
+    }
+    if (_signinManager) {
+        _signinManager.delegate = nil;
+    }
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 

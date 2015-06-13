@@ -45,6 +45,14 @@
     }
 }
 
+- (void)initCellForPostIdea:(UITableViewCell *)cell indexPath:(NSIndexPath *)indexPath {
+    cell.backgroundColor = [UIColor whiteColor];
+    cell.textLabel.text = NSLocalizedStringFromTableInBundle(@"Post an idea", @"UserVoice", [UserVoice bundle], nil);
+    if (IOS7) {
+        cell.textLabel.textColor = cell.textLabel.tintColor;
+    }
+}
+
 - (void)initCellForForum:(UITableViewCell *)cell indexPath:(NSIndexPath *)indexPath {
     cell.backgroundColor = [UIColor whiteColor];
     cell.textLabel.text = NSLocalizedStringFromTableInBundle(@"Feedback Forum", @"UserVoice", [UserVoice bundle], nil);
@@ -126,6 +134,8 @@
             identifier = @"Contact";
         else if (indexPath.section == 0 && [UVSession currentSession].config.showForum)
             identifier = @"Forum";
+        else if (indexPath.section == 0 && [UVSession currentSession].config.showPostIdea)
+            identifier = @"PostIdea";
         else if ([self showArticles])
             identifier = @"Article";
         else
@@ -159,7 +169,7 @@
         if ([UVSession currentSession].config.showKnowledgeBase && ([[UVSession currentSession].topics count] > 0 || [[UVSession currentSession].articles count] > 0))
             sections++;
         
-        if ([UVSession currentSession].config.showForum || [UVSession currentSession].config.showContactUs)
+        if ([UVSession currentSession].config.showForum || [UVSession currentSession].config.showContactUs || [UVSession currentSession].config.showPostIdea)
             sections++;
 
         return sections;
@@ -170,8 +180,8 @@
     if (theTableView == _searchController.searchResultsTableView || _searching) {
         return self.searchResults.count;
     } else {
-        if (section == 0 && ([UVSession currentSession].config.showForum || [UVSession currentSession].config.showContactUs))
-            return ([UVSession currentSession].config.showForum && [UVSession currentSession].config.showContactUs) ? 2 : 1;
+        if (section == 0 && ([UVSession currentSession].config.showForum || [UVSession currentSession].config.showContactUs || [UVSession currentSession].config.showPostIdea))
+            return (([UVSession currentSession].config.showForum || [UVSession currentSession].config.showPostIdea) && [UVSession currentSession].config.showContactUs) ? 2 : 1;
         else if ([self showArticles])
             return [[UVSession currentSession].articles count];
         else
@@ -188,6 +198,8 @@
         } else if (indexPath.section == 0 && [UVSession currentSession].config.showForum) {
             UVSuggestionListViewController *next = [UVSuggestionListViewController new];
             [self.navigationController pushViewController:next animated:YES];
+        } else if (indexPath.section == 0 && [UVSession currentSession].config.showPostIdea) {
+            [self presentModalViewController:[UVPostIdeaViewController new]];
         } else if ([self showArticles]) {
             UVArticle *article = (UVArticle *)[[UVSession currentSession].articles objectAtIndex:indexPath.row];
             UVArticleViewController *next = [UVArticleViewController new];
@@ -213,7 +225,7 @@
 - (NSString *)tableView:(UITableView *)theTableView titleForHeaderInSection:(NSInteger)section {
     if (theTableView == _searchController.searchResultsTableView || _searching)
         return nil;
-    else if (section == 0 && ([UVSession currentSession].config.showForum || [UVSession currentSession].config.showContactUs))
+    else if (section == 0 && ([UVSession currentSession].config.showForum || [UVSession currentSession].config.showContactUs || [UVSession currentSession].config.showPostIdea))
         return nil;
     else if ([UVSession currentSession].config.topicId)
         return [((UVHelpTopic *)[[UVSession currentSession].topics objectAtIndex:0]) name];
@@ -365,6 +377,11 @@
     [_tableView reloadData];
 }
 
+- (void)dismiss {    
+    _instantAnswerManager.delegate = nil;
+    [super dismiss];
+}
+
 - (void)viewWillAppear:(BOOL)animated {
     [_tableView reloadData];
     [super viewWillAppear:animated];
@@ -378,6 +395,19 @@
 
 
 
+}
+
+- (void)dealloc {
+    if (_instantAnswerManager) {
+        _instantAnswerManager.delegate = nil;
+    }
+    if (_searchBar) {
+        _searchBar.delegate = nil;
+    }
+    if (_searchController) {
+        _searchController.searchResultsDelegate = nil;
+        _searchController.searchResultsDataSource = nil;
+    }
 }
 
 @end

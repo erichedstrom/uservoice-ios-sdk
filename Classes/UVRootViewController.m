@@ -35,6 +35,7 @@
 }
 
 - (void)dismiss {
+    _firstController = YES;
     _loader.dismissed = YES;
     [super dismiss];
 }

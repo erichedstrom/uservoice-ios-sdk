@@ -5,7 +5,7 @@ The UserVoice iOS SDK allows you to integrate a native UserVoice experience dire
 To get started, you will need to have a free UserVoice account to connect to. Go to [uservoice.com/mobile/](https://uservoice.com/mobile/) to sign up for free.
 
 Binary builds of the SDK are available for download:
-* Current release is iOS 8 compatible: [3.2.1](https://github.com/uservoice/uservoice-ios-sdk/releases/tag/3.2.1) (updated 2014-09-30)
+* Current release is iOS 8 compatible: [3.2.3](https://github.com/uservoice/uservoice-ios-sdk/releases/tag/3.2.3) (updated 2015-01-30)
 * See [Releases](https://github.com/uservoice/uservoice-ios-sdk/releases) for release notes and previous versions
 
 Example apps:
@@ -18,19 +18,17 @@ Screenshots:
 
 ## Installation
 
-* Download the latest build.
+The recommended way to install the UserVoice SDK is to use CocoaPods.
+
+    pod 'uservoice-iphone-sdk', '~> 3.2'
+
+Alternatively, you can install by hand:
+
+* Download the latest [build](https://github.com/uservoice/uservoice-ios-sdk/releases).
 * Drag `UVHeaders`, `UVResources`, and `libUserVoice.a` into your project.
   * When adding the folders, make sure you have "Create groups for any added folders" selected rather than "Create folder references for any added folders".
 * Note that the `.h` files in  `UVHeaders` do not need to be added to your target.
 * Add QuartzCore and SystemConfiguration frameworks to your project.
-
-See [DEV.md](https://github.com/uservoice/uservoice-iphone-sdk/blob/master/DEV.md) if you want to build the SDK yourself.
-
-## CocoaPods
-
-Alternatively, if you are using CocoaPods just add the following to your Podfile.
-
-    pod 'uservoice-iphone-sdk', '~> 3.2'
 
 ## API
 
@@ -174,12 +172,18 @@ The library will detect and display in the language the device is set to provide
 
 ### Private Sites
 
+Note: UserVoice for iOS does **not** support private **forums**. This section is relevant to those using sitewide privacy.
+
 The SDK relies on being able to obtain a client key to communicate with the UserVoice API. If you have a public UserVoice site (the default) then it can obtain this key automatically, so you only need to pass your site URL. However, if you turn on site privacy, this key is also private, so you will need to pass it in. You can obtain a client key pair from the mobile settings section of the UserVoice admin console.
 
 ```
 UVConfig *config = [UVConfig configWithSite:@"yoursite.uservoice.com" andKey:@"CLIENT_KEY" andSecret:@"CLIENT_SECRET"];
 [UserVoice initialize:config];
 ```
+
+### Kids Apps
+
+The UserVoice Platform, including iOS & Android SDKs, is not COPPA compliant and should not be used in apps marketed at children.
 
 ## Upgrading from 2.0.x
 

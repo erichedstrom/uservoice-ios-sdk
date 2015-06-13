@@ -1,5 +1,23 @@
 ## master ##
 
+## 3.2.3 (2015-01-30) ##
+
+* Fix a bug where launching the contact form from an article would fail
+* Fix a bug related to suggestion list on iPad after posting an idea
+* Clear all delegates on dealloc to prevent crashes
+* Hide the "more" label if there is no description text
+
+## 3.2.2 (2015-01-06) ##
+
+* Fix implementation of navigationBarTextShadowColor
+* Set default navigationBarTintColor from UIAppearance
+* Fix implementation of navigationBarBackgroundColor
+* Fill in missing translations
+* Show post idea in portal view if forum is disabled but post idea is not
+* Fix a bug where instant answer results were blank
+* Fix implementation of preferredStatusBarStyle
+* Fix incorrect casing of an import statement, which would prevent building on a case-sensitive file system
+
 ## 3.2.1 (2014-09-30) ##
 
 * Fix issue where comments would not appear in the comments list after being posted
