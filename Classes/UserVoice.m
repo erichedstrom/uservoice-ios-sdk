@@ -17,8 +17,6 @@
 #import "UVUtils.h"
 #import "UVBabayaga.h"
 
-#import "Message.h"
-
 @implementation UserVoice
 
 static id<UVDelegate> userVoiceDelegate;
@@ -49,6 +47,9 @@ static NSBundle *userVoiceBundle;
     UINavigationController *navigationController = [UVNavigationController new];
     [UVUtils applyStylesheetToNavigationController:navigationController];
     navigationController.viewControllers = viewControllers;
+
+    [navigationController.navigationBar setBarStyle:UIBarStyleBlack];
+
     return navigationController;
 }
 
@@ -101,21 +102,12 @@ static NSBundle *userVoiceBundle;
     return [[UVRootViewController alloc] initWithViewToLoad:@"new_ticket"];
 }
 
-+ (UIViewController *)getMessageReplyForm {
-    UIViewController *viewController = [[UVRootViewController alloc] initWithViewToLoad:@"ticket_reply"];
-  return viewController;
-}
-
 + (UIViewController *)getUserVoiceContactUsFormForModalDisplay {
     return [self getNavigationControllerForUserVoiceControllers:@[[self getUserVoiceContactUsForm]]];
 }
 
 + (void)presentUserVoiceContactUsFormForParentViewController:(UIViewController *)parentViewController {
     [self presentUserVoiceController:[self getUserVoiceContactUsForm] forParentViewController:parentViewController];
-}
-
-+ (void)presentMessageReplyFormForParentViewController:(UIViewController *)parentViewController {
-  [self presentUserVoiceController:[self getMessageReplyForm] forParentViewController:parentViewController];
 }
 
 + (void)presentUserVoiceNewIdeaFormForParentViewController:(UIViewController *)parentViewController {

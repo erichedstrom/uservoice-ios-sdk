@@ -22,7 +22,6 @@
 #import "UVContactViewController.h"
 #import "UVBabayaga.h"
 
-#import "MessageReplyViewController.h"
 #import "Theme.h"
 
 @implementation UVRootViewController
@@ -57,8 +56,6 @@
             next = [UVPostIdeaViewController new];
         else if ([_viewToLoad isEqualToString:@"new_ticket"])
             next = [UVContactViewController new];
-        else if ([_viewToLoad isEqualToString:@"ticket_reply"])
-            next = [MessageReplyViewController new];
 
         next.firstController = YES;
         [self.navigationController pushViewController:next animated:NO];

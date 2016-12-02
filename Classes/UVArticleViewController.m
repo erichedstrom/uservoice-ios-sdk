@@ -14,7 +14,11 @@
 #import "UVBabayaga.h"
 #import "UVDeflection.h"
 #import "UVUtils.h"
+
 #import "Theme.h"
+#import "Utilities.h"
+#import "WeddingPerson.h"
+#import "WHLogUtil.h"
 
 @implementation UVArticleViewController {
     UILabel *_footerLabel;
@@ -33,6 +37,8 @@
 - (void)loadView {
     [super loadView];
     [UVBabayaga track:VIEW_ARTICLE id:_article.articleId];
+    [WHLogUtil logUserActionOnScreen:@"UV Help" action:@"View Help Article" label:self.article.question];
+  
     self.view = [[UIView alloc] initWithFrame:[self contentFrame]];
     self.navigationItem.title = @"";
 
@@ -70,32 +76,39 @@
 
     UIView *footer = [UIView new];
     footer.backgroundColor = [UIColor colorWithRed:0.97f green:0.97f blue:0.97f alpha:1.0f];
-    UIView *border = [UIView new];
-    border.backgroundColor = [UIColor colorWithRed:0.85f green:0.85f blue:0.85f alpha:1.0f];
-    UILabel *label = [UILabel new];
-    label.text = NSLocalizedStringFromTableInBundle(@"Was this article helpful?", @"UserVoice", [UserVoice bundle], nil);
-    label.font = [UIFont systemFontOfSize:13];
-    label.textColor = [UIColor colorWithRed:0.41f green:0.42f blue:0.43f alpha:1.0f];
-    label.backgroundColor = [UIColor clearColor];
-    _footerLabel = label;
-    UIButton *yes = [UIButton new];
-    [yes setTitle:NSLocalizedStringFromTableInBundle(@"Yes!", @"UserVoice", [UserVoice bundle], nil) forState:UIControlStateNormal];
-    [yes setTitleColor:(IOS7 ? yes.tintColor : [UIColor colorWithRed:0.0 green:0.5 blue:1.0 alpha:1.0]) forState:UIControlStateNormal];
-    [yes addTarget:self action:@selector(yesButtonTapped) forControlEvents:UIControlEventTouchUpInside];
-    _yes = yes;
-    UIButton *no = [UIButton new];
-    [no setTitle:NSLocalizedStringFromTableInBundle(@"No", @"UserVoice", [UserVoice bundle], nil) forState:UIControlStateNormal];
-    [no setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];
-    [no addTarget:self action:@selector(noButtonTapped) forControlEvents:UIControlEventTouchUpInside];
-    _no = no;
-    NSArray *constraints = @[
-        @"|[border]|", @"|-[label]-(>=10)-[yes]-30-[no]-30-|",
-        @"V:|[border(==1)]", @"V:|-15-[label]", (IOS7 ? @"V:|-6-[yes]" : @"V:|-12-[yes]"), (IOS7 ? @"V:|-6-[no]" : @"V:|-12-[no]")
-    ];
-    [self configureView:footer
-               subviews:NSDictionaryOfVariableBindings(border, label, yes, no)
-            constraints:constraints];
 
+    WeddingPerson *weddingPerson = [Utilities fetchCurrentWeddingPerson];
+    if (weddingPerson) {
+      footerHeight = 0;
+    }
+    else {
+
+      UIView *border = [UIView new];
+      border.backgroundColor = [UIColor colorWithRed:0.85f green:0.85f blue:0.85f alpha:1.0f];
+      UILabel *label = [UILabel new];
+      label.text = NSLocalizedStringFromTableInBundle(@"Was this article helpful?", @"UserVoice", [UserVoice bundle], nil);
+      label.font = [UIFont systemFontOfSize:13];
+      label.textColor = [UIColor colorWithRed:0.41f green:0.42f blue:0.43f alpha:1.0f];
+      label.backgroundColor = [UIColor clearColor];
+      _footerLabel = label;
+      UIButton *yes = [UIButton new];
+      [yes setTitle:NSLocalizedStringFromTableInBundle(@"Yes!", @"UserVoice", [UserVoice bundle], nil) forState:UIControlStateNormal];
+      [yes setTitleColor:(IOS7 ? yes.tintColor : [UIColor colorWithRed:0.0 green:0.5 blue:1.0 alpha:1.0]) forState:UIControlStateNormal];
+      [yes addTarget:self action:@selector(yesButtonTapped) forControlEvents:UIControlEventTouchUpInside];
+      _yes = yes;
+      UIButton *no = [UIButton new];
+      [no setTitle:NSLocalizedStringFromTableInBundle(@"No", @"UserVoice", [UserVoice bundle], nil) forState:UIControlStateNormal];
+      [no setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];
+      [no addTarget:self action:@selector(noButtonTapped) forControlEvents:UIControlEventTouchUpInside];
+      _no = no;
+      NSArray *constraints = @[
+          @"|[border]|", @"|-[label]-(>=10)-[yes]-30-[no]-30-|",
+          @"V:|[border(==1)]", @"V:|-15-[label]", (IOS7 ? @"V:|-6-[yes]" : @"V:|-12-[yes]"), (IOS7 ? @"V:|-6-[no]" : @"V:|-12-[no]")
+      ];
+      [self configureView:footer
+                 subviews:NSDictionaryOfVariableBindings(border, label, yes, no)
+              constraints:constraints];
+    }
     [self configureView:self.view
                subviews:NSDictionaryOfVariableBindings(_webView, footer)
             constraints:@[@"V:|[_webView]|", @"V:[footer]|", @"|[_webView]|", @"|[footer]|"]];
@@ -103,7 +116,7 @@
     [self.view bringSubviewToFront:footer];
 }
 
-- (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex {
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
     if (_helpfulPrompt) {
         if (buttonIndex == 0) {
             [self.navigationController popViewControllerAnimated:YES];
@@ -114,7 +127,7 @@
         if (buttonIndex == 0) {
 
           UVContactViewController *uvcvc = [UVContactViewController new];
-          uvcvc.title = [NSString stringWithFormat: @"Article Not Helpful: %@", _article.question ];
+          uvcvc.messageTitle = [NSString stringWithFormat: @"Article Not Helpful: %@", _article.question ];
             [self presentModalViewController:uvcvc];
         }
     }

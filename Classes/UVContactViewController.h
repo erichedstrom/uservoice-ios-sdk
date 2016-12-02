@@ -17,7 +17,7 @@
 @property (nonatomic, retain) UITextField *emailField;
 @property (nonatomic, retain) UITextField *firstNameField;
 @property (nonatomic, retain) UITextField *lastNameField;
-@property (nonatomic, retain) NSString *title;
+@property (nonatomic, retain) NSString *messageTitle;
 
 @property (nonatomic,retain) UVInstantAnswerManager *instantAnswerManager;
 @property (nonatomic,retain) NSString *loadedDraft;

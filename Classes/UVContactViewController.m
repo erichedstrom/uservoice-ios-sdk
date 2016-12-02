@@ -42,39 +42,53 @@
     _instantAnswerManager.articleReturnMessage = NSLocalizedStringFromTableInBundle(@"Yes, go to my message", @"UserVoice", [UserVoice bundle], nil);
     _instantAnswerManager.deflectingType = @"Ticket";
 
-  self.navigationItem.title = NSLocalizedString(@"Your Message", @"Your Message");
+    self.navigationItem.title = NSLocalizedString(@"Your Message", @"Your Message");
 
     // using a fields view with no fields extra still gives us better scroll handling
     _fieldsView = [UVTextWithFieldsView new];
 
-    _firstNameField = [_fieldsView addFieldWithLabel:NSLocalizedString(@"First Name", @"First Name") ];
+    _firstNameField = [_fieldsView addFieldWithLabel:NSLocalizedString(@"First name", @"First name") ];
     _firstNameField.placeholder = NSLocalizedString(@"Required", @"Required");
     _firstNameField.text = [[NSUserDefaults standardUserDefaults] objectForKey:@"uv-user-first-name"]; //self.userName;
-  _firstNameField.font = [Theme font];
+    _firstNameField.font = [Theme cellTextFont];
 
-    _lastNameField= [_fieldsView addFieldWithLabel:NSLocalizedString(@"Last Name", @"Last Name")];
+    // get the first name from the account
+    if (_firstNameField.text.length > 0) {
+      _firstNameField.userInteractionEnabled = NO;
+    }
+
+    _lastNameField= [_fieldsView addFieldWithLabel:NSLocalizedString(@"Last name", @"Last name")];
     _lastNameField.placeholder = NSLocalizedString(@"Required", @"Required");
-  _lastNameField.text = [[NSUserDefaults standardUserDefaults] objectForKey:@"uv-user-last-name"];
-    _lastNameField.font = [Theme font];
+    _lastNameField.text = [[NSUserDefaults standardUserDefaults] objectForKey:@"uv-user-last-name"];
+    _lastNameField.font = [Theme cellTextFont];
+
+    // get the last name from the account
+    if (_lastNameField.text.length > 0) {
+      _lastNameField.userInteractionEnabled = NO;
+    }
 
     _emailField = [_fieldsView addFieldWithLabel:NSLocalizedStringFromTableInBundle(@"Email", @"UserVoice", [UserVoice bundle], nil)];
     _emailField.keyboardType = UIKeyboardTypeEmailAddress;
     _emailField.autocorrectionType = UITextAutocorrectionTypeNo;
     _emailField.autocapitalizationType = UITextAutocapitalizationTypeNone;
     _emailField.placeholder = NSLocalizedString(@"Required", @"Required");
-    _emailField.font = [Theme font];
+    _emailField.font = [Theme cellTextFont];
     WeddingPerson *weddingPerson = [Utilities fetchCurrentWeddingPerson];
 
     // don't populate the email field if it is the default WeddingPerson.id@appuser..
-    if (![self.userEmail hasPrefix:weddingPerson.objectId]) {
+    if (weddingPerson.objectId && ![self.userEmail hasPrefix:weddingPerson.objectId]) {
       _emailField.text = self.userEmail;
     }
 
-//    _fieldsView.textView.placeholder = NSLocalizedStringFromTableInBundle(@"Give feedback or ask for help...", @"UserVoice", [UserVoice bundle], nil);
+    // get the first name from the account
+    if (_emailField.text.length > 0) {
+      _emailField.userInteractionEnabled = NO;
+    }
+
 
       _fieldsView.textView.placeholder = NSLocalizedString(@"Your message...", @"Your message...");
 
-  _fieldsView.textView.font = [Theme font];
+    _fieldsView.textView.font = [Theme cellTextFont];
 
     _fieldsView.textViewDelegate = self;
     [self configureView:view
@@ -115,6 +129,7 @@
     [self loadDraft];
     self.navigationItem.rightBarButtonItem.enabled = ([_fieldsView.textView.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]].length > 0);
     self.view = view;
+    [self.navigationController.navigationBar setBarStyle:UIBarStyleBlack];
 
     [[UVSession currentSession].user enableEmailUpdates:NO delegate:self];
 }
@@ -122,6 +137,7 @@
 - (void)viewWillAppear:(BOOL)animated {
   self.navigationItem.title = NSLocalizedString(@"Your Message", @"Your Message");
     [_fieldsView.textView becomeFirstResponder];
+
     [super viewWillAppear:animated];
 }
 
@@ -248,7 +264,7 @@
 
   NSMutableDictionary *customFields = [NSMutableDictionary dictionary];
 
-  [UVTicket createWithMessage:_fieldsView.textView.text andEmailIfNotLoggedIn:self.userEmail andName:self.userName andTitle:self.title andCustomFields:customFields andDelegate:self];
+  [UVTicket createWithMessage:_fieldsView.textView.text andEmailIfNotLoggedIn:self.userEmail andName:self.userName andTitle:self.messageTitle andCustomFields:customFields andDelegate:self];
 }
 
 - (void)sendWithEmail:(NSString *)email name:(NSString *)name fields:(NSDictionary *)fields {
@@ -262,7 +278,7 @@
       changedEmail = YES;
     }
     WeddingPerson *weddingPerson = [Utilities fetchCurrentWeddingPerson];
-    if ([self.userEmail length] == 0 || [self.userEmail hasPrefix:weddingPerson.objectId]) {
+    if ([self.userEmail length] == 0 || (weddingPerson.objectId && [self.userEmail hasPrefix:weddingPerson.objectId])) {
 
       UIAlertView *emailAlert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Verify Email", @"Verify Email") message:NSLocalizedString(@"Please enter a valid email address.", @"Please enter a valid email address.") delegate:self
                                                  cancelButtonTitle:NSLocalizedString(@"OK", @"OK") otherButtonTitles:nil];
@@ -295,7 +311,7 @@
     UVSuccessViewController *next = [UVSuccessViewController new];
     next.titleText = NSLocalizedString(@"Thank you!", @"Thank you!");
 
-    next.text = NSLocalizedString(@"Your message has been sent.\n\nWe review our messages regularly. If your request needs a reply, you will find that in your Inbox on the Home screen.", @"Your message has been sent.\n\nWe review our messages regularly. If your request needs a reply, you will find that in your Inbox on the Home screen.");
+    next.text = NSLocalizedString(@"Your message has been sent.\n\nWe review our messages regularly. If your request needs a reply, we will get back to you shortly.", @"Your message has been sent.\n\nWe review our messages regularly. If your request needs a reply, we will get back to you shortly.");
     [self.navigationController setViewControllers:@[next] animated:YES];
 }
 
@@ -369,9 +385,6 @@
 - (void)dealloc {
     if (_instantAnswerManager) {
         _instantAnswerManager.delegate = nil;
-    }
-    if (_detailsController) {
-        _detailsController.delegate = nil;
     }
 }
 

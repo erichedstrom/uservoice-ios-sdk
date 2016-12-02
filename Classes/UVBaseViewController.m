@@ -537,7 +537,6 @@
 - (void) viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     [self.tableView setContentOffset:self.tableView.contentOffset animated:NO];
-    [super viewWillDisappear:animated];
 }
 
 - (void)dealloc {

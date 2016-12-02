@@ -89,7 +89,7 @@
     [field setContentHuggingPriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
     UILabel *label = [UILabel new];
     label.text = [NSString stringWithFormat:@"%@:", labelText];
-  label.font = [Theme font];
+  label.font = [Theme cellTextFont];
     label.backgroundColor = [UIColor clearColor];
     label.textColor = [UIColor grayColor];
     [label setContentHuggingPriority:UILayoutPriorityDefaultHigh forAxis:UILayoutConstraintAxisHorizontal];
