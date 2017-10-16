@@ -1,11 +1,15 @@
 ## UserVoice iOS SDK ([download demo app](https://itunes.apple.com/us/app/uservoice-help-center/id907516756))
 
+In this article, we will walk you through your options for setting up the iOS SDK.
+If you need features not outlined in this article, please share them as feature requests on our feedback forum [here](https://feedback.uservoice.com/forums/64513-developer-api-sdks/category/162129-mobile-sdks-any).
+That is the best channel for requesting additional functionality.
+
 The UserVoice iOS SDK allows you to integrate a native UserVoice experience directly in your iPhone or iPad app, allowing you to provide Instant Answers to your customers’ questions, a searchable knowledge base, and feedback forum. Our contact form is a friendlier experience than an email composer filled with debug information, and also eliminates those blank requests clogging up your inbox.
 
 To get started, you will need to have a free UserVoice account to connect to. Go to [uservoice.com/mobile/](https://uservoice.com/mobile/) to sign up for free.
 
 Binary builds of the SDK are available for download:
-* Current release is iOS 8 compatible: [3.2.9](https://github.com/uservoice/uservoice-ios-sdk/releases/tag/3.2.9) (updated 2016-09-07)
+* Current release: [3.2.11](https://github.com/uservoice/uservoice-ios-sdk/releases/tag/3.2.11) (updated 2017-10-03)
 * See [Releases](https://github.com/uservoice/uservoice-ios-sdk/releases) for release notes and previous versions
 
 Example apps:
@@ -91,11 +95,11 @@ article.
 
     config.topicId = 123;
 
-### Custom Fields
+### Ticket Fields
 
-You can set custom field values on the `UVConfig` object. These will be used
+You can set ticket field values on the `UVConfig` object. These will be used
 associated with any tickets the user creates during their session. You can
-also use this to set default values for custom fields on the contact form.
+also use this to set default values for ticket fields on the contact form.
 
 Note: You must first configure these fields in the UserVoice admin console.
 If you pass fields that are not recognized by the server, they will be ignored.
@@ -308,3 +312,25 @@ limitations under the License.
 
 
 [![githalytics.com alpha](https://cruel-carlota.pagodabox.com/f5b60bff0fbee98bc0e43f57eb49576f "githalytics.com")](http://githalytics.com/uservoice/uservoice-iphone-sdk)
+
+### Reporting Issues
+
+If you are finding an issue, first make sure you are using the latest version of the SDK:
+
+Latest Android SDK version here: https://github.com/uservoice/uservoice-ios-sdk/releases
+
+If you are on the latest version, you need to file an issue on our [github issues page](https://github.com/uservoice/uservoice-ios-sdk/issues) with the following information:
+
+* What behavior are you currently seeing? (ie. response, error, screen)
+
+* What behavior did you expect to see?
+
+Our engineers have requested example code from your team, which they can download example, run, and plainly see the resulting problem.  
+
+To do this, they will need:
+
+* The minimum amount of code required to demonstrate the problem using a [secret gist](gist.github.com).  
+* Isolate the problem to the few lines that call the SDK, plus the minimum boilerplate necessary to compile and run the example.
+* If we will need example secrets or a test account, make that clear in the code or accompanying explanation.
+
+Once filed, you can also reach out to our support team at questions@uservoice.com

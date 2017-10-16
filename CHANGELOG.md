@@ -1,5 +1,11 @@
 ## master ##
 
+## 3.2.11 (2017-10-03)
+* Fix a build issue
+
+## 3.2.10 (2017-06-30)
+* Fix a bug when submitting a suggestion with a category in non-English locales
+
 ## 3.2.9 (2016-09-07)
 * Fix a crash caused by receiving a 429 rate limit response
 
