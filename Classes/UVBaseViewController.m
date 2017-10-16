@@ -23,6 +23,11 @@
 #import "AuthService.h"
 #import "Theme.h"
 
+#define TITLE 20
+#define SUBSCRIBER_COUNT 21
+#define STATUS 22
+#define STATUS_COLOR 23
+
 @implementation UVBaseViewController
 
 - (id)init {
@@ -205,7 +210,7 @@
     // We are the top modal, make to sure that parent modals use our size
     if (self.needNestedModalHack && self.presentedViewController == nil && self.presentingViewController) {
         for (UIViewController* parent = self.presentingViewController;
-             parent.presentingViewController;
+             [parent isKindOfClass:UVBaseViewController.class] && parent.presentingViewController;
              parent = parent.presentingViewController) {
             parent.view.superview.frame = parent.presentedViewController.view.superview.frame;
         }
@@ -219,7 +224,7 @@
     // We are the top modal, make to sure that parent modals are hidden during transition
     if (self.needNestedModalHack && self.presentedViewController == nil && self.presentingViewController) {
         for (UIViewController* parent = self.presentingViewController;
-             parent.presentingViewController;
+             [parent isKindOfClass:UVBaseViewController.class] && parent.presentingViewController;
              parent = parent.presentingViewController) {
             parent.view.superview.hidden = YES;
         }
@@ -232,7 +237,7 @@
     // We are the top modal, make to sure that parent modals are shown after animation
     if (self.needNestedModalHack && self.presentedViewController == nil && self.presentingViewController) {
         for (UIViewController* parent = self.presentingViewController;
-             parent.presentingViewController;
+            [parent isKindOfClass:UVBaseViewController.class] && parent.presentingViewController;
              parent = parent.presentingViewController) {
             parent.view.superview.hidden = NO;
         }
@@ -246,6 +251,57 @@
 }
 
 #pragma mark ===== helper methods for table views =====
+
+- (void)initCellForSuggestion:(UITableViewCell *)cell indexPath:(NSIndexPath *)indexPath {
+    cell.backgroundColor = [UIColor whiteColor];
+    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+    UIImageView *heart = [UVUtils imageViewWithImageNamed:@"uv_heart.png"];
+    UILabel *subs = [UILabel new];
+    subs.font = [UIFont systemFontOfSize:14];
+    subs.textColor = [UIColor grayColor];
+    subs.tag = SUBSCRIBER_COUNT;
+    UILabel *title = [UILabel new];
+    title.numberOfLines = 0;
+    title.tag = TITLE;
+    title.font = [UIFont systemFontOfSize:17];
+    UILabel *status = [UILabel new];
+    status.font = [UIFont systemFontOfSize:11];
+    status.tag = STATUS;
+    UIView *statusColor = [UIView new];
+    statusColor.tag = STATUS_COLOR;
+    CALayer *layer = [CALayer layer];
+    layer.frame = CGRectMake(0, 0, 9, 9);
+    [statusColor.layer addSublayer:layer];
+    NSArray *constraints = @[
+                             @"|-16-[title]-|",
+                             @"|-16-[heart(==9)]-3-[subs]-10-[statusColor(==9)]-5-[status]",
+                             @"V:|-12-[title]-6-[heart(==9)]",
+                             @"V:[title]-6-[statusColor(==9)]",
+                             @"V:[title]-4-[status]",
+                             @"V:[title]-2-[subs]"
+                             ];
+    [self configureView:cell.contentView
+               subviews:NSDictionaryOfVariableBindings(subs, title, heart, statusColor, status)
+            constraints:constraints
+         finalCondition:indexPath == nil
+        finalConstraint:@"V:[heart]-14-|"];
+}
+
+- (void)customizeCellForSuggestion:(UVSuggestion *)suggestion cell:(UITableViewCell *)cell {
+    UILabel *title = (UILabel *)[cell.contentView viewWithTag:TITLE];
+    UILabel *subs = (UILabel *)[cell.contentView viewWithTag:SUBSCRIBER_COUNT];
+    UILabel *status = (UILabel *)[cell.contentView viewWithTag:STATUS];
+    UIView *statusColor = [cell.contentView viewWithTag:STATUS_COLOR];
+    title.text = suggestion.title;
+    if ([UVSession currentSession].clientConfig.displaySuggestionsByRank) {
+        subs.text = suggestion.rankString;
+    } else {
+        subs.text = [NSString stringWithFormat:@"%d", (int)suggestion.subscriberCount];
+    }
+    [(CALayer *)statusColor.layer.sublayers.lastObject setBackgroundColor:suggestion.statusColor.CGColor];
+    status.textColor = suggestion.statusColor;
+    status.text = [suggestion.status uppercaseString];
+}
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
@@ -357,6 +413,15 @@
 
 - (void)setupGroupedTableView {
     _tableView = [[UITableView alloc] initWithFrame:[self contentFrame] style:UITableViewStyleGrouped];
+    [self tableViewSetup];
+}
+
+- (void)setupPlainTableView {
+    _tableView = [[UITableView alloc] initWithFrame:[self contentFrame] style:UITableViewStylePlain];
+    [self tableViewSetup];
+}
+
+- (void)tableViewSetup {
     _tableView.delegate = (id<UITableViewDelegate>)self;
     _tableView.dataSource = (id<UITableViewDataSource>)self;
     if ([UVStyleSheet instance].tableViewBackgroundColor) {
@@ -368,6 +433,8 @@
         _tableView.backgroundColor = [UVStyleSheet instance].tableViewBackgroundColor;
     }
     self.view = _tableView;
+    // Remove empty table cells from the bottom of the table view
+    _tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
 }
 
 - (void)setView:(UIView *)view {
@@ -466,7 +533,21 @@
     CGFloat width = self.view.frame.size.width;
     CGFloat accessoryWidth = 0;
     CGFloat margin = 0;
-    if (IOS7) {
+    if (IOS8) {
+        if (IPAD || IPHONE_PLUS) {
+            if (accessoryType == UITableViewCellAccessoryDisclosureIndicator) {
+                accessoryWidth = 38;
+            } else if (accessoryType == UITableViewCellAccessoryCheckmark) {
+                accessoryWidth = 44;
+            }
+        } else {
+            if (accessoryType == UITableViewCellAccessoryDisclosureIndicator) {
+                accessoryWidth = 34;
+            } else if (accessoryType == UITableViewCellAccessoryCheckmark) {
+                accessoryWidth = 40;
+            }
+        }
+    } else if (IOS7) {
         if (accessoryType == UITableViewCellAccessoryDisclosureIndicator) {
             accessoryWidth = 33;
         } else if (accessoryType == UITableViewCellAccessoryCheckmark) {

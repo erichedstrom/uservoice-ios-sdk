@@ -312,6 +312,7 @@
     next.titleText = NSLocalizedString(@"Thank you!", @"Thank you!");
 
     next.text = NSLocalizedString(@"Your message has been sent.\n\nWe review our messages regularly. If your request needs a reply, we will get back to you shortly.", @"Your message has been sent.\n\nWe review our messages regularly. If your request needs a reply, we will get back to you shortly.");
+    next.firstController = self.firstController;
     [self.navigationController setViewControllers:@[next] animated:YES];
 }
 

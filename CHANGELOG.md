@@ -1,5 +1,43 @@
 ## master ##
 
+## 3.2.9 (2016-09-07)
+* Fix a crash caused by receiving a 429 rate limit response
+
+## 3.2.8 (2016-07-08)
+
+* Implement OAuth clock sync
+* Update Xcode settings
+* Update some translations
+* Fix warnings
+* Add carthage support
+
+## 3.2.7 (2016-03-21)
+
+* Fix a crash caused by a null page number in an api response
+
+## 3.2.6 (2016-03-21)
+
+* Fix the issues surrounding recently added security to articles API endpoint
+
+## 3.2.5 (2016-03-10)
+
+* Add pagination support on portal view
+
+## 3.2.4 (2016-03-08)
+
+* Fix a bug where the userVoiceWasDismissed callback was not always called
+* Bump the maximum number of topics to display on the portal from 10 to 100
+* Fix a bug where admins would see unpublished articles in the sdk
+* Update nl localization
+* Fix a bug where presentation on the iPad could potentially mess with the frame of the host controller
+* Fix a bug where status display was broken if there was no specified color for that status
+* Open links within articles in Safari
+* Update jp localization
+* Fix a bug where html entities were shown in forum prompt
+* Display images and articles to fit display width
+* Update zh-Hant localization
+* Fix bundle path for iOS 8.1
+
 ## 3.2.3 (2015-01-30) ##
 
 * Fix a bug where launching the contact form from an article would fail

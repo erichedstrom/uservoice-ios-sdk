@@ -17,6 +17,7 @@
 #import "UVBabayaga.h"
 #import "UVClientConfig.h"
 #import "Theme.h"
+#import "UVPaginationInfo.h"
 
 #define LABEL 100
 #define TOPIC 101
@@ -88,7 +89,7 @@
     if (_topic) {
         [self configureView:cell.contentView
                    subviews:NSDictionaryOfVariableBindings(label)
-                constraints:@[@"|-16-[label]-|", @"V:|-12-[label]-12-|"]];
+                constraints:@[@"|-20-[label]-|", @"V:|-12-[label]-12-|"]];
     } else {
         UILabel *topic = [UILabel new];
         topic.font = [UIFont systemFontOfSize:12];
@@ -96,7 +97,7 @@
         topic.tag = TOPIC;
         [self configureView:cell.contentView
                    subviews:NSDictionaryOfVariableBindings(label, topic)
-                constraints:@[@"|-16-[label]-|", @"|-16-[topic]-|", @"V:|-12-[label]-6-[topic]"]
+                constraints:@[@"|-20-[label]-|", @"|-20-[topic]-|", @"V:|-12-[label]-6-[topic]"]
              finalCondition:indexPath == nil
             finalConstraint:@"V:[topic]-12-|"];
     }
@@ -137,12 +138,10 @@
     _loading = NO;
 }
 
-- (void)didRetrieveArticles:(NSArray *)theArticles {
+- (void)didRetrieveArticles:(NSArray *)theArticles pagination:(UVPaginationInfo *)pagination {
     [self hideActivityIndicator];
     [_articles addObjectsFromArray:theArticles];
-    if (theArticles.count < ARTICLE_PAGE_SIZE || (_topic && _articles.count >= _topic.articleCount)) {
-        _allArticlesLoaded = YES;
-    }
+    _allArticlesLoaded = !pagination.hasMoreData;
     [_tableView reloadData];
 }
 

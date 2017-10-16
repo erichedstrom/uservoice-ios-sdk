@@ -57,13 +57,14 @@
     section = @""; //NSLocalizedStringFromTableInBundle(@"Knowledge base", @"UserVoice", [UserVoice bundle], nil);
   }
 
-  NSString *linkColor;
+    _webView.delegate = self;
+    NSString *linkColor;
     if (IOS7) {
         linkColor = [UVUtils colorToCSS:self.view.tintColor];
     } else {
         linkColor = @"default";
     }
-    NSString *html = [NSString stringWithFormat:@"<html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"http://cdn.uservoice.com/stylesheets/vendor/typeset.css\"/><style>a { color: %@; }</style></head><body class=\"typeset\" style=\"font-family: HelveticaNeue; margin: 1em; font-size: 15px\"><h5 style='font-weight: normal; color: #999; font-size: 13px;'>%@</h5><h3 style='margin-top: 10px; margin-bottom: 20px; font-size: 18px; font-family: HelveticaNeue-Medium; font-weight: normal; line-height: 1.3'>%@</h3>%@</body></html>", linkColor, section, _article.question, _article.answerHTML];
+    NSString *html = [NSString stringWithFormat:@"<html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"https://cdn.uservoice.com/stylesheets/vendor/typeset.css\"/><style>a { color: %@; } img { max-width: 100%%; width: auto; height: auto; }</style></head><body class=\"typeset\" style=\"font-family: HelveticaNeue; margin: 1em; font-size: 15px\"><h5 style='font-weight: normal; color: #999; font-size: 13px'>%@</h5><h3 style='margin-top: 10px; margin-bottom: 20px; font-size: 18px; font-family: HelveticaNeue-Medium; font-weight: normal; line-height: 1.3'>%@</h3>%@</body></html>", linkColor, section, _article.question, _article.answerHTML];
     _webView.backgroundColor = [UIColor whiteColor];
     for (UIView* shadowView in [[_webView scrollView] subviews]) {
         if ([shadowView isKindOfClass:[UIImageView class]]) {
@@ -116,7 +117,15 @@
     [self.view bringSubviewToFront:footer];
 }
 
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
+
+- (BOOL)webView:(UIWebView *)view shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
+    if (navigationType == UIWebViewNavigationTypeLinkClicked) {
+        return ![[UIApplication sharedApplication] openURL:request.URL];
+    }
+    return YES;
+}
+
+- (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex {
     if (_helpfulPrompt) {
         if (buttonIndex == 0) {
             [self.navigationController popViewControllerAnimated:YES];

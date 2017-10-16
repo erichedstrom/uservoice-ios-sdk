@@ -13,6 +13,7 @@
 #import "UVCustomField.h"
 #import "UVRequestContext.h"
 #import "UVForum.h"
+#import "UVPaginationInfo.h"
 
 @implementation UVResponseDelegate
 
@@ -29,9 +30,13 @@
     if (requestContext.statusCode >= 400) {
         NSDictionary *userInfo = nil;
 
-        if ([resource respondsToSelector:@selector(objectForKey:)])
-            userInfo = [resource objectForKey:@"errors"];
-
+        if ([resource respondsToSelector:@selector(objectForKey:)]) {
+            id errors = [resource objectForKey:@"errors"];
+            if (errors && ![errors isKindOfClass:[NSDictionary class]]) {
+              errors = @{ @"errors": errors };
+            }
+            userInfo = errors;
+        }
         NSError *error = [NSError errorWithDomain:@"uservoice" code:requestContext.statusCode userInfo:userInfo];
         [requestContext.modelClass didReceiveError:error context:object];
 
@@ -59,7 +64,8 @@
                 for (id item in root) {
                     [models addObject:[requestContext.modelClass modelForDictionary:item]];
                 }
-                [requestContext.modelClass didReturnModels:models context:object];
+                UVPaginationInfo *pagination = [self getPaginationInfo:[self objectOrNilForDict:dict key:@"response_data"]];
+                [requestContext.modelClass didReturnModels:models pagination:pagination context:object];
             } else {
                 [requestContext.modelClass didReturnModel:[requestContext.modelClass modelForDictionary:root] context:object];
             }
@@ -81,5 +87,22 @@
     UVRequestContext *requestContext = (UVRequestContext *)object;
     [requestContext.modelClass didReceiveError:error context:object];
 }
+
+- (UVPaginationInfo *)getPaginationInfo:(NSDictionary *)dict {
+    UVPaginationInfo *pagination = [UVPaginationInfo new];
+    pagination.page = [(NSNumber *)[self objectOrNilForDict:dict key:@"page"] integerValue];
+    pagination.pageSize = [(NSNumber *)[self objectOrNilForDict:dict key:@"per_page"] integerValue];
+    pagination.totalRecords = [(NSNumber *)[self objectOrNilForDict:dict key:@"total_records"] integerValue];
+    return pagination;
+}
+
+- (id)objectOrNilForDict:(NSDictionary *)dict key:(id)key {
+    id object = [dict objectForKey:key];
+    if ([[NSNull null] isEqual:object]) {
+        object = nil;
+    }
+    return object;
+}
+
 
 @end
